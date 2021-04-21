@@ -12,5 +12,10 @@
 
 """
 from scrapy import cmdline
+from weather.pipelines import WeatherPipeline
+
+w = WeatherPipeline()
+w.clear_capital()
+# print("数据库省会表清理完成")
 
 cmdline.execute('scrapy crawl china_weather'.split())

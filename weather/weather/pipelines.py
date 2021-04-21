@@ -10,10 +10,12 @@ import pandas as pd
 import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 
 class WeatherPipeline:
     def __init__(self):
+        # self.engine = create_engine('mysql+pymysql://root:root@localhost/weather?charset=utf8')
         self.engine = create_engine('mysql+pymysql://root:root@localhost/weather?charset=utf8')
         # 创建链接
         self.Session_class = sessionmaker(bind=self.engine)
@@ -25,9 +27,13 @@ class WeatherPipeline:
         由于 每次传递的省会信息都是一个独立的 DF 所以需要 append 存储，如果 省会表已经存在则会导致 append 是找不到对应列名
         通过原生 SQL 语句对 省会表进行删除
         """
-        cmd_sql = "DROP TABLE provincial_capital"
+        print("开始清理省会表")
+        cmd_sql0 = "USE weather;"
+        self.Session.execute(cmd_sql0)
+        cmd_sql = "DROP TABLE IF EXISTS provincial_capital;"
         self.Session.execute(cmd_sql)
         self.Session.commit()
+        print("省会表清理完毕，关闭连接")
         self.Session.close()
 
     def process_item(self, item, spider):
